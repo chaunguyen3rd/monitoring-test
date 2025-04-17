@@ -1,29 +1,29 @@
 groups:
-- name: nginx
+- name: containers
   rules:
-  - alert: HighCPUUsage
-    expr: rate(process_cpu_seconds_total{job="nginx"}[1m]) * 100 > 90
+  - alert: ContainerHighCPUUsage
+    expr: sum(rate(container_cpu_usage_seconds_total{name="webapp"}[1m])) * 100 > 90
     for: 10m
     labels:
       severity: warning
     annotations:
-      summary: "High CPU usage (instance {{ $labels.instance }})"
-      description: "CPU usage is above 90% for more than 10 minutes\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
-
-  - alert: HighConnectionCount
-    expr: nginx_connections_active > 100
-    for: 5m
-    labels:
-      severity: warning
-    annotations:
-      summary: "High number of connections (instance {{ $labels.instance }})"
-      description: "NGINX active connections is above 100\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+      summary: "Container high CPU usage (container {{ $labels.name }})"
+      description: "Container CPU usage is above 90% for more than 10 minutes\n  VALUE = {{ $value }}%\n  LABELS = {{ $labels }}"
       
-  - alert: HighHTTPErrorRate
-    expr: sum(rate(nginx_http_requests_total{status=~"^5.."}[5m])) / sum(rate(nginx_http_requests_total[5m])) * 100 > 5
+  - alert: ContainerHighMemoryUsage
+    expr: (container_memory_usage_bytes{name="webapp"} / container_spec_memory_limit_bytes{name="webapp"} * 100) > 90
     for: 5m
     labels:
       severity: warning
     annotations:
-      summary: "High HTTP error rate (instance {{ $labels.instance }})"
-      description: "HTTP error rate is above 5%\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+      summary: "Container high memory usage (container {{ $labels.name }})"
+      description: "Container memory usage is above 90% of its limit for more than 5 minutes\n  VALUE = {{ $value }}%\n  LABELS = {{ $labels }}"
+
+  - alert: ContainerDown
+    expr: absent(container_last_seen{name="webapp"})
+    for: 1m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Container down (container {{ $labels.name }})"
+      description: "Container has disappeared\n  LABELS = {{ $labels }}"

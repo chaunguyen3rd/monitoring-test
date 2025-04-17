@@ -49,7 +49,7 @@
         "for": "10m",
         "frequency": "1m",
         "handler": 1,
-        "name": "WebApp CPU Usage alert",
+        "name": "Container CPU Usage alert",
         "noDataState": "no_data",
         "notifications": []
       },
@@ -58,7 +58,7 @@
       "dashLength": 10,
       "dashes": false,
       "datasource": "Prometheus",
-      "description": "CPU usage for the webapp container running on port 9100",
+      "description": "CPU usage for the webapp container - matches docker stats",
       "fieldConfig": {
         "defaults": {
           "custom": {}
@@ -68,7 +68,7 @@
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
-        "h": 8,
+        "h": 9,
         "w": 24,
         "x": 0,
         "y": 0
@@ -76,10 +76,11 @@
       "hiddenSeries": false,
       "id": 1,
       "legend": {
-        "avg": false,
+        "alignAsTable": true,
+        "avg": true,
         "current": true,
         "max": true,
-        "min": false,
+        "min": true,
         "show": true,
         "total": false,
         "values": true
@@ -100,16 +101,10 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "rate(process_cpu_seconds_total{job=\"nginx\", instance=\"nginx\"}[1m]) * 100",
+          "expr": "sum(rate(container_cpu_usage_seconds_total{name=\"webapp\"}[1m])) * 100",
           "interval": "",
-          "legendFormat": "WebApp CPU Usage %",
+          "legendFormat": "Container CPU Usage %",
           "refId": "A"
-        },
-        {
-          "expr": "rate(nginx_connections_accepted{job=\"nginx\"}[1m])",
-          "interval": "",
-          "legendFormat": "Connection Rate",
-          "refId": "B"
         }
       ],
       "thresholds": [
@@ -124,7 +119,7 @@
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "WebApp CPU Usage (Port 9100)",
+      "title": "Container CPU Usage (matches docker stats)",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -153,7 +148,7 @@
           "logBase": 1,
           "max": null,
           "min": null,
-          "show": true
+          "show": false
         }
       ],
       "yaxis": {
@@ -167,7 +162,7 @@
       "dashLength": 10,
       "dashes": false,
       "datasource": "Prometheus",
-      "description": "Memory usage for the webapp container running on port 9100",
+      "description": "Memory usage for the webapp container - matches docker stats",
       "fieldConfig": {
         "defaults": {
           "custom": {}
@@ -177,18 +172,19 @@
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
-        "h": 8,
+        "h": 9,
         "w": 24,
         "x": 0,
-        "y": 8
+        "y": 9
       },
       "hiddenSeries": false,
       "id": 2,
       "legend": {
-        "avg": false,
+        "alignAsTable": true,
+        "avg": true,
         "current": true,
         "max": true,
-        "min": false,
+        "min": true,
         "show": true,
         "total": false,
         "values": true
@@ -209,23 +205,17 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "process_resident_memory_bytes{job=\"nginx\", instance=\"nginx\"} / 1024 / 1024",
+          "expr": "container_memory_usage_bytes{name=\"webapp\"} / 1024 / 1024",
           "interval": "",
-          "legendFormat": "WebApp Memory Usage (MB)",
+          "legendFormat": "Container Memory Usage (MB)",
           "refId": "A"
-        },
-        {
-          "expr": "nginx_connections_active{job=\"nginx\"}",
-          "interval": "",
-          "legendFormat": "Active Connections",
-          "refId": "B"
         }
       ],
       "thresholds": [],
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "WebApp Memory Usage (Port 9100)",
+      "title": "Container Memory Usage (matches docker stats)",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -254,7 +244,7 @@
           "logBase": 1,
           "max": null,
           "min": null,
-          "show": true
+          "show": false
         }
       ],
       "yaxis": {
@@ -264,11 +254,11 @@
     },
     {
       "aliasColors": {},
-      "bars": true,
+      "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "Loki",
-      "description": "Error count from the webapp container logs",
+      "datasource": "Prometheus",
+      "description": "Network usage for the webapp container",
       "fieldConfig": {
         "defaults": {
           "custom": {}
@@ -278,24 +268,25 @@
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
-        "h": 8,
+        "h": 9,
         "w": 24,
         "x": 0,
-        "y": 16
+        "y": 18
       },
       "hiddenSeries": false,
       "id": 3,
       "legend": {
-        "avg": false,
+        "alignAsTable": true,
+        "avg": true,
         "current": true,
-        "max": false,
-        "min": false,
+        "max": true,
+        "min": true,
         "show": true,
         "total": false,
         "values": true
       },
-      "lines": false,
-      "linewidth": 1,
+      "lines": true,
+      "linewidth": 2,
       "nullPointMode": "null",
       "options": {
         "dataLinks": []
@@ -310,16 +301,23 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum(count_over_time({job=\"webapp\"}[5m]))",
-          "legendFormat": "Error Logs",
+          "expr": "rate(container_network_receive_bytes_total{name=\"webapp\"}[1m])",
+          "interval": "",
+          "legendFormat": "Network Receive (bytes/sec)",
           "refId": "A"
+        },
+        {
+          "expr": "rate(container_network_transmit_bytes_total{name=\"webapp\"}[1m])",
+          "interval": "",
+          "legendFormat": "Network Transmit (bytes/sec)",
+          "refId": "B"
         }
       ],
       "thresholds": [],
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "WebApp Error Count (Port 9100)",
+      "title": "Container Network Usage",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -335,7 +333,7 @@
       },
       "yaxes": [
         {
-          "format": "short",
+          "format": "Bps",
           "label": null,
           "logBase": 1,
           "max": null,
@@ -383,7 +381,7 @@
     ]
   },
   "timezone": "",
-  "title": "WebApp Container Dashboard (Port 9100)",
-  "uid": "webapp-dashboard",
+  "title": "Container Resource Dashboard",
+  "uid": "container-dashboard",
   "version": 1
 }

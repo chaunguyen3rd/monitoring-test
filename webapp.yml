@@ -14,21 +14,7 @@ services:
     networks:
       - monitoring-network
 
-  # Add exporter to collect metrics from NGINX
-  nginx-exporter:
-    image: nginx/nginx-prometheus-exporter:latest
-    container_name: nginx-exporter
-    ports:
-      - "9113:9113"
-    command:
-      - -nginx.scrape-uri=http://webapp/nginx_status
-    depends_on:
-      - webapp
-    restart: unless-stopped
-    networks:
-      - monitoring-network
-
-  # Add this service to generate test errors in logs
+  # Log generator for testing
   log-generator:
     image: busybox
     container_name: log-generator

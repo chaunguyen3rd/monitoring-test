@@ -22,9 +22,10 @@ scrape_configs:
         labels:
           instance: "prometheus"
 
-  - job_name: "nginx"
+  # cAdvisor for container metrics
+  - job_name: "cadvisor"
+    scrape_interval: 5s
     static_configs:
-      - targets: ["nginx-exporter:9113"]
+      - targets: ["cadvisor:8080"]
         labels:
-          instance: "nginx"
-    metrics_path: /metrics
+          instance: "cadvisor"
