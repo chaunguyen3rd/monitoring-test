@@ -28,6 +28,21 @@ services:
     networks:
       - monitoring-network
 
+  # Add this service to generate test errors in logs
+  log-generator:
+    image: busybox
+    container_name: log-generator
+    depends_on:
+      - webapp
+    command: >
+      sh -c "while true; do 
+             wget -q -O /dev/null http://webapp/not-found-page || true; 
+             sleep 30; 
+             done"
+    restart: unless-stopped
+    networks:
+      - monitoring-network
+
 networks:
   monitoring-network:
     driver: bridge

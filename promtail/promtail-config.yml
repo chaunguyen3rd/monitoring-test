@@ -32,16 +32,19 @@ scrape_configs:
       - labels:
           container_name:
 
-  - job_name: webapp
+  - job_name: webapp_logs
     static_configs:
       - targets:
           - localhost
         labels:
           job: webapp
+          app: nginx
           __path__: /var/log/nginx/error.log
     pipeline_stages:
       - regex:
           expression: ".*(?P<level>error|Error|ERROR|warn|Warn|WARNING).*"
+      - labels:
+          level:
       - metrics:
           error_count:
             type: Counter
@@ -49,3 +52,4 @@ scrape_configs:
             source: level
             config:
               action: inc
+              match_all: true

@@ -297,8 +297,8 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum(rate({container_name=\"webapp\"} |~ \"(?i)error|(?i)warn\" [5m])) by (level)",
-          "legendFormat": "Error Rate",
+          "expr": "sum(count_over_time({job=\"webapp\", app=\"nginx\"} |~ \"(?i)error|(?i)warn\" [5m])) by (level)",
+          "legendFormat": "{{level}} Count",
           "refId": "A"
         }
       ],
@@ -326,7 +326,7 @@
           "label": null,
           "logBase": 1,
           "max": null,
-          "min": null,
+          "min": "0",
           "show": true
         },
         {
@@ -335,7 +335,7 @@
           "logBase": 1,
           "max": null,
           "min": null,
-          "show": true
+          "show": false
         }
       ],
       "yaxis": {
