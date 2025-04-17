@@ -13,24 +13,18 @@ scrape_configs:
   - job_name: docker
     static_configs:
       - targets:
-          - { { STACK_HOSTNAME } }
+          - localhost
         labels:
           job: docker
-          host: { { STACK_HOSTNAME } }
           __path__: /var/lib/docker/containers/*/*-json.log
 
   # NGINX error logs with explicit configuration
   - job_name: nginx_error_logs
     static_configs:
       - targets:
-          - { { STACK_HOSTNAME } }
+          - localhost
         labels:
           job: webapp
           app: nginx
-          host: { { STACK_HOSTNAME } }
           log_type: error
           __path__: /var/log/nginx/error.log
-    pipeline_stages:
-      # Add hostname label to help identify logs
-      - static_labels:
-          hostname: { { STACK_HOSTNAME } }

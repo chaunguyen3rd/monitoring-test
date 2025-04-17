@@ -16,7 +16,6 @@ echo ""
 
 # Detect default IP
 DEFAULT_IP=$(hostname -I | awk '{print $1}')
-DEFAULT_HOSTNAME=$(hostname)
 
 # Ask for IP address
 echo -e "${YELLOW}What IP address would you like to use for the monitoring stack?${NC}"
@@ -25,12 +24,6 @@ echo -e "${YELLOW}Press enter to use default: ${DEFAULT_IP}${NC}"
 read -p "IP Address: " STACK_IP
 STACK_IP=${STACK_IP:-$DEFAULT_IP}
 
-# Ask for hostname
-echo -e "${YELLOW}What hostname would you like to use?${NC}"
-echo -e "${YELLOW}Press enter to use default: ${DEFAULT_HOSTNAME}${NC}"
-read -p "Hostname: " STACK_HOSTNAME
-STACK_HOSTNAME=${STACK_HOSTNAME:-$DEFAULT_HOSTNAME}
-
 # Ask for Grafana admin password
 echo -e "${YELLOW}Set Grafana admin password (press enter for default: admin)${NC}"
 read -s -p "Password: " GRAFANA_PASSWORD
@@ -38,7 +31,6 @@ echo ""
 GRAFANA_PASSWORD=${GRAFANA_PASSWORD:-admin}
 
 echo -e "${GREEN}Using IP: ${STACK_IP}${NC}"
-echo -e "${GREEN}Using hostname: ${STACK_HOSTNAME}${NC}"
 echo ""
 
 # Create necessary directories if they don't exist
@@ -49,11 +41,10 @@ mkdir -p {webapp/{html,logs},prometheus,alertmanager,loki,promtail,grafana/{prov
 chmod -R 777 webapp/logs
 
 # Update .env file with provided values
-echo -e "${GREEN}Updating environment configuration...${NC}"
+echo -e "${GREEN}Creating environment configuration...${NC}"
 cat > .env <<EOF
 # Host configuration
 STACK_IP=${STACK_IP}
-STACK_HOSTNAME=${STACK_HOSTNAME}
 
 # Ports
 NGINX_PORT=9100
@@ -67,32 +58,29 @@ GF_SECURITY_ADMIN_USER=admin
 GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
 EOF
 
-echo -e "${GREEN}Updating configuration files with your IP (${STACK_IP}) and hostname (${STACK_HOSTNAME})...${NC}"
-
-# Update webapp NGINX config with hostname
-sed -i "s/{{STACK_HOSTNAME}}/${STACK_HOSTNAME}/g" webapp/nginx.conf
-
-# Update webapp HTML file with IP and hostname
+# Update HTML file with IP
+echo -e "${GREEN}Updating HTML page with your IP (${STACK_IP})...${NC}"
 sed -i "s/{{STACK_IP}}/${STACK_IP}/g" webapp/html/index.html
-sed -i "s/{{STACK_HOSTNAME}}/${STACK_HOSTNAME}/g" webapp/html/index.html
+sed -i "s/{{STACK_HOSTNAME}}/-/g" webapp/html/index.html
 
-# Update Prometheus config with hostname
-sed -i "s/{{STACK_HOSTNAME}}/${STACK_HOSTNAME}/g" prometheus/prometheus.yml
+# Update NGINX config (remove hostname dependency)
+echo -e "${GREEN}Updating NGINX configuration...${NC}"
+sed -i "s/server_name  {{STACK_HOSTNAME}};/server_name  _;/g" webapp/nginx.conf
 
-# Update Promtail config with hostname
-sed -i "s/{{STACK_HOSTNAME}}/${STACK_HOSTNAME}/g" promtail/promtail-config.yml
+# Update Prometheus config
+echo -e "${GREEN}Updating Prometheus configuration...${NC}"
+sed -i "s/{{STACK_HOSTNAME}}/monitoring-host/g" prometheus/prometheus.yml
 
-# Update monitoring-stack.yml with IP and hostname
-sed -i "s/{{STACK_IP}}/\${STACK_IP}/g" monitoring-stack.yml
-sed -i "s/{{STACK_HOSTNAME}}/\${STACK_HOSTNAME}/g" monitoring-stack.yml
-
-# Update webapp.yml with hostname
-sed -i "s/{{STACK_HOSTNAME}}/\${STACK_HOSTNAME}/g" webapp.yml
+# Update Promtail config
+echo -e "${GREEN}Updating Promtail configuration...${NC}"
+sed -i "s/{{STACK_HOSTNAME}}/monitoring-host/g" promtail/promtail-config.yml
 
 # Update README.md with IP
+echo -e "${GREEN}Updating README...${NC}"
 sed -i "s/{{STACK_IP}}/${STACK_IP}/g" README.md
 
 # Update test script with IP
+echo -e "${GREEN}Updating test script...${NC}"
 sed -i "s/{{STACK_IP}}/${STACK_IP}/g" test.sh
 
 # Create a test error log to ensure the directory is writable

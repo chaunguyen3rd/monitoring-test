@@ -2,7 +2,7 @@ global:
   scrape_interval: 15s
   evaluation_interval: 15s
   external_labels:
-    monitor: "{{STACK_HOSTNAME}}"
+    monitor: "monitoring-stack"
 
 # Alertmanager configuration
 alerting:
@@ -20,11 +20,11 @@ scrape_configs:
     static_configs:
       - targets: ["localhost:9090"]
         labels:
-          instance: "{{STACK_HOSTNAME}}"
+          instance: "prometheus"
 
   - job_name: "nginx"
     static_configs:
       - targets: ["nginx-exporter:9113"]
         labels:
-          instance: "{{STACK_HOSTNAME}}"
+          instance: "nginx"
     metrics_path: /metrics
