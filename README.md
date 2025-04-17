@@ -1,103 +1,87 @@
-# Docker Monitoring Stack
+# Monitoring Stack
 
-This project sets up a complete monitoring stack using Docker Compose, including:
+A complete monitoring setup for web applications with Grafana, Prometheus, Loki, and Alertmanager.
 
-- NGINX Web Application (running on port 9100)
-- NGINX Prometheus Exporter (for metrics collection)
-- Prometheus (metrics storage and alerting)
-- Grafana (visualization)
-- Loki (log aggregation)
-- Alertmanager (alert management)
-- Promtail (for log collection)
+## Components
+
+- **NGINX Web Application** (Port 9100): Demo application to monitor
+- **Prometheus** (Port 9090): Metrics collection and alerting
+- **Grafana** (Port 3000): Visualization and dashboards
+- **Loki** (Port 3100): Log aggregation
+- **Alertmanager** (Port 9093): Alert management
+- **Promtail**: Log collection agent
+
+## Quick Start
+
+1. Run the setup script to configure IP addresses:
+
+   ```bash
+   ./setup.sh
+   ```
+
+2. Start the web application:
+
+   ```bash
+   docker-compose --env-file .env -f webapp.yml up -d
+   ```
+
+3. Start the monitoring stack:
+
+   ```bash
+   docker-compose --env-file .env -f monitoring-stack.yml up -d
+   ```
+
+4. Access the web application at http://{{STACK_IP}}:9100
+5. Access Grafana at http://{{STACK_IP}}:3000 (login: admin / password)
+
+## Testing the Monitoring
+
+The dashboard has three panels:
+
+- CPU Usage
+- Memory Usage
+- Error Count from logs
+
+To generate test data:
+
+- Visit http://{{STACK_IP}}:9100 and use the "Generate CPU Load" button
+- Run the test script: `./test.sh`
+- The log-generator service will automatically create error logs
 
 ## Directory Structure
 
-```txt
+```
 monitoring-stack/
-├── alertmanager/
-│   └── alertmanager.yml
-├── grafana/
-│   ├── dashboards/
-│   │   └── nginx-dashboard.json
-│   └── provisioning/
-│       ├── dashboards/
-│       │   └── dashboards.yml
-│       └── datasources/
-│           └── datasources.yml
-├── loki/
-│   └── loki-config.yml
-├── prometheus/
-│   ├── alert.rules
-│   └── prometheus.yml
-├── promtail/
-│   └── promtail-config.yml
+├── .env                              # Environment configuration
+├── webapp.yml                        # Web application Docker Compose
+├── monitoring-stack.yml              # Monitoring stack Docker Compose
+├── setup.sh                          # Setup script
+├── test.sh                           # Test data generator
+├── README.md                         # Documentation
 ├── webapp/
-│   ├── html/
-│   │   └── index.html
-│   └── nginx.conf
-├── monitoring-stack.yml
-├── webapp.yml
-└── README.md
+│   ├── html/                         # Web content
+│   │   └── index.html                # Demo page
+│   ├── nginx.conf                    # NGINX configuration
+│   └── logs/                         # Log directory
+├── prometheus/
+│   ├── prometheus.yml                # Prometheus configuration
+│   └── alert.rules                   # Alert definitions
+├── alertmanager/
+│   └── alertmanager.yml              # Alertmanager configuration
+├── grafana/
+│   ├── dashboards/                   # Grafana dashboards
+│   │   └── nginx-dashboard.json      # NGINX monitoring dashboard
+│   └── provisioning/                 # Grafana auto-configuration
+│       ├── dashboards/               # Dashboard provisioning
+│       │   └── dashboards.yml        # Dashboard config
+│       └── datasources/              # Data source provisioning
+│           └── datasources.yml       # Data source config
+└── promtail/
+    └── promtail-config.yml           # Promtail configuration
 ```
 
-## Setup Instructions
+## Customization
 
-1. Create the directory structure as shown above.
-2. Copy all configuration files to their respective locations.
-3. Start the web application container first:
-
-    ```bash
-    docker-compose -f webapp.yml up -d
-    ```
-
-4. Start the monitoring stack:
-
-    ```bash
-    docker-compose -f monitoring-stack.yml up -d
-    ```
-
-5. Access Grafana at <http://localhost:3000> (username: admin, password: admin)
-6. The dashboard should be automatically provisioned with three panels:
-   - CPU Usage
-   - Memory Usage
-   - Error Count from logs
-7. Access the web application at <http://localhost:9100>
-
-## Alert Configuration
-
-Several alert rules have been configured:
-
-- CPU usage > 90% for more than 10 minutes
-- High connection count (more than 100 active connections)
-- HTTP error rate > 5% for more than 5 minutes
-
-These alerts are visible in both Prometheus and Alertmanager, and will also appear in Grafana.
-
-## Additional Information
-
-- Prometheus is available at <http://localhost:9090>
-- Alertmanager is available at <http://localhost:9093>
-- Loki is available at <http://localhost:3100>
-
-## Troubleshooting
-
-If you don't see metrics or logs:
-
-1. Check that all containers are running: `docker ps`
-2. Check container logs: `docker logs [container_name]`
-3. Verify network connectivity between containers
-
-## Testing Alerts
-
-To test the alerts:
-
-1. **CPU Usage Alert**:
-   - Use the "Generate CPU Load" button on the web application
-   - For a more sustained load, you can run: `docker exec -it webapp sh -c "for i in {1..1000000}; do echo 'calculating'; done"`
-
-2. **High Connection Count Alert**:
-   - Use a load testing tool like Apache Bench: `ab -n 1000 -c 100 http://localhost:9100/`
-
-3. **HTTP Error Rate Alert**:
-   - Request non-existent pages: `curl http://localhost:9100/not-found`
-   - You can script this to generate multiple errors
+- Edit the `.env` file to change ports or credentials
+- Modify Prometheus alerts in `prometheus/alert.rules`
+- Add more dashboards to `grafana/dashboards/`

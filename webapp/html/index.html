@@ -2,7 +2,7 @@
 <html>
 
 <head>
-  <title>Monitor Me</title>
+  <title>Monitoring Demo</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -43,11 +43,30 @@
       margin-top: 30px;
       text-align: center;
     }
+
+    .links {
+      margin-top: 40px;
+      text-align: center;
+    }
+
+    .links a {
+      display: inline-block;
+      margin: 0 10px;
+      padding: 10px 20px;
+      background-color: #2196F3;
+      color: white;
+      text-decoration: none;
+      border-radius: 4px;
+    }
+
+    .links a:hover {
+      background-color: #0b7dda;
+    }
   </style>
 </head>
 
 <body>
-  <h1>Test Web Application (Port 9100)</h1>
+  <h1>Monitoring Demo on {{STACK_HOSTNAME}} ({{STACK_IP}})</h1>
 
   <div class="counter">
     Page Views: <span id="counter">0</span>
@@ -59,6 +78,13 @@
     <h2>Generate CPU Load</h2>
     <button id="cpuLoadBtn">Start CPU Load (10s)</button>
     <p>Status: <span id="loadStatus">Idle</span></p>
+  </div>
+
+  <div class="links">
+    <h2>Monitoring Links</h2>
+    <a href="http://{{STACK_IP}}:3000" target="_blank">Grafana</a>
+    <a href="http://{{STACK_IP}}:9090" target="_blank">Prometheus</a>
+    <a href="http://{{STACK_IP}}:9093" target="_blank">AlertManager</a>
   </div>
 
   <script>

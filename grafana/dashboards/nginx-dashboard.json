@@ -252,7 +252,7 @@
     },
     {
       "aliasColors": {},
-      "bars": false,
+      "bars": true,
       "dashLength": 10,
       "dashes": false,
       "datasource": "Loki",
@@ -281,7 +281,7 @@
         "total": false,
         "values": false
       },
-      "lines": true,
+      "lines": false,
       "linewidth": 1,
       "nullPointMode": "null",
       "options": {
@@ -297,8 +297,8 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum(count_over_time({job=\"webapp\", app=\"nginx\"} |~ \"(?i)error|(?i)warn\" [5m])) by (level)",
-          "legendFormat": "{{level}} Count",
+          "expr": "count_over_time({job=\"webapp\"}[5m])",
+          "legendFormat": "Error Logs",
           "refId": "A"
         }
       ],
@@ -370,7 +370,7 @@
     ]
   },
   "timezone": "",
-  "title": "NGINX Web Application Monitoring",
+  "title": "NGINX Monitoring Dashboard",
   "uid": "nginx-dashboard",
   "version": 1
 }
