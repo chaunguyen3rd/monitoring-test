@@ -13,7 +13,6 @@
     ]
   },
   "editable": true,
-  "gnetId": null,
   "graphTooltip": 0,
   "id": 1,
   "links": [],
@@ -50,7 +49,7 @@
         "for": "10m",
         "frequency": "1m",
         "handler": 1,
-        "name": "CPU Usage alert",
+        "name": "WebApp CPU Usage alert",
         "noDataState": "no_data",
         "notifications": []
       },
@@ -59,6 +58,7 @@
       "dashLength": 10,
       "dashes": false,
       "datasource": "Prometheus",
+      "description": "CPU usage for the webapp container running on port 9100",
       "fieldConfig": {
         "defaults": {
           "custom": {}
@@ -69,29 +69,28 @@
       "fillGradient": 0,
       "gridPos": {
         "h": 8,
-        "w": 12,
+        "w": 24,
         "x": 0,
         "y": 0
       },
       "hiddenSeries": false,
-      "id": 2,
+      "id": 1,
       "legend": {
         "avg": false,
-        "current": false,
-        "max": false,
+        "current": true,
+        "max": true,
         "min": false,
         "show": true,
         "total": false,
-        "values": false
+        "values": true
       },
       "lines": true,
-      "linewidth": 1,
+      "linewidth": 2,
       "nullPointMode": "null",
       "options": {
         "dataLinks": []
       },
       "percentage": false,
-      "pluginVersion": "7.1.1",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -101,9 +100,9 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "rate(process_cpu_seconds_total{job=\"nginx\"}[1m]) * 100",
+          "expr": "rate(process_cpu_seconds_total{job=\"nginx\", instance=\"nginx-exporter:9113\"}[1m]) * 100",
           "interval": "",
-          "legendFormat": "CPU Usage %",
+          "legendFormat": "WebApp CPU Usage %",
           "refId": "A"
         }
       ],
@@ -119,7 +118,7 @@
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "CPU Usage",
+      "title": "WebApp CPU Usage (Port 9100)",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -148,7 +147,7 @@
           "logBase": 1,
           "max": null,
           "min": null,
-          "show": true
+          "show": false
         }
       ],
       "yaxis": {
@@ -162,6 +161,7 @@
       "dashLength": 10,
       "dashes": false,
       "datasource": "Prometheus",
+      "description": "Memory usage for the webapp container running on port 9100",
       "fieldConfig": {
         "defaults": {
           "custom": {}
@@ -172,23 +172,23 @@
       "fillGradient": 0,
       "gridPos": {
         "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 0
+        "w": 24,
+        "x": 0,
+        "y": 8
       },
       "hiddenSeries": false,
-      "id": 4,
+      "id": 2,
       "legend": {
         "avg": false,
-        "current": false,
-        "max": false,
+        "current": true,
+        "max": true,
         "min": false,
         "show": true,
         "total": false,
-        "values": false
+        "values": true
       },
       "lines": true,
-      "linewidth": 1,
+      "linewidth": 2,
       "nullPointMode": "null",
       "options": {
         "dataLinks": []
@@ -203,9 +203,9 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "process_resident_memory_bytes{job=\"nginx\"} / 1024 / 1024",
+          "expr": "process_resident_memory_bytes{job=\"nginx\", instance=\"nginx-exporter:9113\"} / 1024 / 1024",
           "interval": "",
-          "legendFormat": "Memory Usage (MB)",
+          "legendFormat": "WebApp Memory Usage (MB)",
           "refId": "A"
         }
       ],
@@ -213,7 +213,7 @@
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "Memory Usage",
+      "title": "WebApp Memory Usage (Port 9100)",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -242,7 +242,7 @@
           "logBase": 1,
           "max": null,
           "min": null,
-          "show": true
+          "show": false
         }
       ],
       "yaxis": {
@@ -256,6 +256,7 @@
       "dashLength": 10,
       "dashes": false,
       "datasource": "Loki",
+      "description": "Error count from the webapp container logs",
       "fieldConfig": {
         "defaults": {
           "custom": {}
@@ -268,18 +269,18 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 8
+        "y": 16
       },
       "hiddenSeries": false,
-      "id": 6,
+      "id": 3,
       "legend": {
         "avg": false,
-        "current": false,
+        "current": true,
         "max": false,
         "min": false,
         "show": true,
         "total": false,
-        "values": false
+        "values": true
       },
       "lines": false,
       "linewidth": 1,
@@ -297,7 +298,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "count_over_time({job=\"webapp\"}[5m])",
+          "expr": "sum(count_over_time({job=\"webapp\", app=\"nginx\", log_type=\"error\"}[5m]))",
           "legendFormat": "Error Logs",
           "refId": "A"
         }
@@ -306,7 +307,7 @@
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "Error Count from Logs",
+      "title": "WebApp Error Count (Port 9100)",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -370,7 +371,7 @@
     ]
   },
   "timezone": "",
-  "title": "NGINX Monitoring Dashboard",
-  "uid": "nginx-dashboard",
+  "title": "WebApp Container Dashboard (Port 9100)",
+  "uid": "webapp-dashboard",
   "version": 1
 }
