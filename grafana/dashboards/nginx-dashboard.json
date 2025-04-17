@@ -100,10 +100,16 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "rate(process_cpu_seconds_total{job=\"nginx\", instance=\"nginx-exporter:9113\"}[1m]) * 100",
+          "expr": "rate(process_cpu_seconds_total{job=\"nginx\", instance=\"nginx\"}[1m]) * 100",
           "interval": "",
           "legendFormat": "WebApp CPU Usage %",
           "refId": "A"
+        },
+        {
+          "expr": "rate(nginx_connections_accepted{job=\"nginx\"}[1m])",
+          "interval": "",
+          "legendFormat": "Connection Rate",
+          "refId": "B"
         }
       ],
       "thresholds": [
@@ -147,7 +153,7 @@
           "logBase": 1,
           "max": null,
           "min": null,
-          "show": false
+          "show": true
         }
       ],
       "yaxis": {
@@ -203,10 +209,16 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "process_resident_memory_bytes{job=\"nginx\", instance=\"nginx-exporter:9113\"} / 1024 / 1024",
+          "expr": "process_resident_memory_bytes{job=\"nginx\", instance=\"nginx\"} / 1024 / 1024",
           "interval": "",
           "legendFormat": "WebApp Memory Usage (MB)",
           "refId": "A"
+        },
+        {
+          "expr": "nginx_connections_active{job=\"nginx\"}",
+          "interval": "",
+          "legendFormat": "Active Connections",
+          "refId": "B"
         }
       ],
       "thresholds": [],
@@ -242,7 +254,7 @@
           "logBase": 1,
           "max": null,
           "min": null,
-          "show": false
+          "show": true
         }
       ],
       "yaxis": {
@@ -298,7 +310,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum(count_over_time({job=\"webapp\", app=\"nginx\", log_type=\"error\"}[5m]))",
+          "expr": "sum(count_over_time({job=\"webapp\"}[5m]))",
           "legendFormat": "Error Logs",
           "refId": "A"
         }
