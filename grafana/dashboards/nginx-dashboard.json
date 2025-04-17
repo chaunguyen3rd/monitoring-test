@@ -49,7 +49,7 @@
         "for": "10m",
         "frequency": "1m",
         "handler": 1,
-        "name": "Container CPU Usage alert",
+        "name": "CPU Usage Alert (Port 9100)",
         "noDataState": "no_data",
         "notifications": []
       },
@@ -58,7 +58,7 @@
       "dashLength": 10,
       "dashes": false,
       "datasource": "Prometheus",
-      "description": "CPU usage for the webapp container - matches docker stats",
+      "description": "CPU usage for container on port 9100",
       "fieldConfig": {
         "defaults": {
           "custom": {}
@@ -68,7 +68,7 @@
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
-        "h": 9,
+        "h": 10,
         "w": 24,
         "x": 0,
         "y": 0
@@ -80,7 +80,7 @@
         "avg": true,
         "current": true,
         "max": true,
-        "min": true,
+        "min": false,
         "show": true,
         "total": false,
         "values": true
@@ -101,9 +101,9 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum(rate(container_cpu_usage_seconds_total{name=\"webapp\"}[1m])) * 100",
+          "expr": "sum(rate(container_cpu_usage_seconds_total{container_label_com_docker_compose_service=\"webapp\"}[1m])) * 100",
           "interval": "",
-          "legendFormat": "Container CPU Usage %",
+          "legendFormat": "CPU Usage %",
           "refId": "A"
         }
       ],
@@ -119,7 +119,7 @@
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "Container CPU Usage (matches docker stats)",
+      "title": "CPU Usage (Port 9100)",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -162,7 +162,7 @@
       "dashLength": 10,
       "dashes": false,
       "datasource": "Prometheus",
-      "description": "Memory usage for the webapp container - matches docker stats",
+      "description": "Memory usage for container on port 9100",
       "fieldConfig": {
         "defaults": {
           "custom": {}
@@ -172,10 +172,10 @@
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
-        "h": 9,
+        "h": 10,
         "w": 24,
         "x": 0,
-        "y": 9
+        "y": 10
       },
       "hiddenSeries": false,
       "id": 2,
@@ -184,7 +184,7 @@
         "avg": true,
         "current": true,
         "max": true,
-        "min": true,
+        "min": false,
         "show": true,
         "total": false,
         "values": true
@@ -205,9 +205,9 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "container_memory_usage_bytes{name=\"webapp\"} / 1024 / 1024",
+          "expr": "container_memory_usage_bytes{container_label_com_docker_compose_service=\"webapp\"} / 1024 / 1024",
           "interval": "",
-          "legendFormat": "Container Memory Usage (MB)",
+          "legendFormat": "Memory Usage (MB)",
           "refId": "A"
         }
       ],
@@ -215,7 +215,7 @@
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "Container Memory Usage (matches docker stats)",
+      "title": "Memory Usage (Port 9100)",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -253,12 +253,14 @@
       }
     },
     {
-      "aliasColors": {},
-      "bars": false,
+      "aliasColors": {
+        "Error Logs": "red"
+      },
+      "bars": true,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "Prometheus",
-      "description": "Network usage for the webapp container",
+      "datasource": "Loki",
+      "description": "Error logs from the container on port 9100",
       "fieldConfig": {
         "defaults": {
           "custom": {}
@@ -268,24 +270,24 @@
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
-        "h": 9,
+        "h": 10,
         "w": 24,
         "x": 0,
-        "y": 18
+        "y": 20
       },
       "hiddenSeries": false,
       "id": 3,
       "legend": {
         "alignAsTable": true,
-        "avg": true,
+        "avg": false,
         "current": true,
         "max": true,
-        "min": true,
+        "min": false,
         "show": true,
-        "total": false,
+        "total": true,
         "values": true
       },
-      "lines": true,
+      "lines": false,
       "linewidth": 2,
       "nullPointMode": "null",
       "options": {
@@ -301,23 +303,16 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "rate(container_network_receive_bytes_total{name=\"webapp\"}[1m])",
-          "interval": "",
-          "legendFormat": "Network Receive (bytes/sec)",
+          "expr": "sum(count_over_time({job=\"webapp\", log_type=\"error\"}[5m]))",
+          "legendFormat": "Error Logs",
           "refId": "A"
-        },
-        {
-          "expr": "rate(container_network_transmit_bytes_total{name=\"webapp\"}[1m])",
-          "interval": "",
-          "legendFormat": "Network Transmit (bytes/sec)",
-          "refId": "B"
         }
       ],
       "thresholds": [],
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "Container Network Usage",
+      "title": "Error Logs (Port 9100)",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -333,7 +328,7 @@
       },
       "yaxes": [
         {
-          "format": "Bps",
+          "format": "short",
           "label": null,
           "logBase": 1,
           "max": null,
@@ -381,7 +376,7 @@
     ]
   },
   "timezone": "",
-  "title": "Container Resource Dashboard",
-  "uid": "container-dashboard",
+  "title": "WebApp Container Dashboard (Port 9100)",
+  "uid": "webapp-9100",
   "version": 1
 }

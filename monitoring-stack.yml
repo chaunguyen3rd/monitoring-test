@@ -56,6 +56,7 @@ services:
       - monitoring-network
     depends_on:
       - prometheus
+      - loki
 
   # cAdvisor for container monitoring
   cadvisor:
@@ -72,10 +73,39 @@ services:
       - monitoring-network
     restart: unless-stopped
 
+  # Loki for log aggregation
+  loki:
+    image: grafana/loki:latest
+    container_name: loki
+    ports:
+      - "${LOKI_PORT:-3100}:3100"
+    volumes:
+      - loki_data:/loki
+    restart: unless-stopped
+    networks:
+      - monitoring-network
+
+  # Promtail for log collection
+  promtail:
+    image: grafana/promtail:latest
+    container_name: promtail
+    volumes:
+      - ./promtail/promtail-config.yml:/etc/promtail/config.yml
+      - /var/log:/var/log
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - ./webapp/logs:/var/log/nginx:ro # Direct mapping for NGINX logs
+    command: -config.file=/etc/promtail/config.yml
+    restart: unless-stopped
+    networks:
+      - monitoring-network
+    depends_on:
+      - loki
+
 volumes:
   prometheus_data:
   alertmanager_data:
   grafana_data:
+  loki_data:
 
 networks:
   monitoring-network:
