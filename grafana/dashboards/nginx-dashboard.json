@@ -157,12 +157,14 @@
       }
     },
     {
-      "aliasColors": {},
+      "aliasColors": {
+        "RSS Memory (MB)": "blue"
+      },
       "bars": false,
       "dashLength": 10,
       "dashes": false,
       "datasource": "Prometheus",
-      "description": "Memory usage for container on port 9100",
+      "description": "Memory usage for container on port 9100 that matches docker stats",
       "fieldConfig": {
         "defaults": {
           "custom": {}
@@ -205,9 +207,9 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "container_memory_usage_bytes{container_label_com_docker_compose_service=\"webapp\"} / 1024 / 1024",
+          "expr": "container_memory_rss{container_label_com_docker_compose_service=\"webapp\"} / 1024 / 1024",
           "interval": "",
-          "legendFormat": "Memory Usage (MB)",
+          "legendFormat": "RSS Memory (MB)",
           "refId": "A"
         }
       ],
