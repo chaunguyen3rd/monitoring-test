@@ -1,0 +1,29 @@
+groups:
+- name: nginx
+  rules:
+  - alert: HighCPUUsage
+    expr: rate(process_cpu_seconds_total{job="nginx"}[1m]) * 100 > 90
+    for: 10m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High CPU usage (instance {{ $labels.instance }})"
+      description: "CPU usage is above 90% for more than 10 minutes\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+
+  - alert: HighConnectionCount
+    expr: nginx_connections_active > 100
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High number of connections (instance {{ $labels.instance }})"
+      description: "NGINX active connections is above 100\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+      
+  - alert: HighHTTPErrorRate
+    expr: sum(rate(nginx_http_requests_total{status=~"^5.."}[5m])) / sum(rate(nginx_http_requests_total[5m])) * 100 > 5
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High HTTP error rate (instance {{ $labels.instance }})"
+      description: "HTTP error rate is above 5%\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"

@@ -1,0 +1,33 @@
+version: "3.8"
+
+services:
+  webapp:
+    image: nginx:latest
+    container_name: webapp
+    ports:
+      - "9100:80"
+    volumes:
+      - ./webapp/html:/usr/share/nginx/html:ro
+      - ./webapp/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./webapp/logs:/var/log/nginx
+    restart: unless-stopped
+    networks:
+      - monitoring-network
+
+  # Add exporter to collect metrics from NGINX
+  nginx-exporter:
+    image: nginx/nginx-prometheus-exporter:latest
+    container_name: nginx-exporter
+    ports:
+      - "9113:9113"
+    command:
+      - -nginx.scrape-uri=http://webapp/nginx_status
+    depends_on:
+      - webapp
+    restart: unless-stopped
+    networks:
+      - monitoring-network
+
+networks:
+  monitoring-network:
+    driver: bridge

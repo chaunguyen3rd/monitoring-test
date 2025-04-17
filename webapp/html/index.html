@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Monitor Me</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      line-height: 1.6;
+    }
+
+    h1 {
+      color: #333;
+      text-align: center;
+    }
+
+    .counter {
+      font-size: 24px;
+      text-align: center;
+      margin: 20px 0;
+    }
+
+    button {
+      display: block;
+      margin: 0 auto;
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    .cpu-load {
+      margin-top: 30px;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Test Web Application (Port 9100)</h1>
+
+  <div class="counter">
+    Page Views: <span id="counter">0</span>
+  </div>
+
+  <button id="incrementBtn">Increment Counter</button>
+
+  <div class="cpu-load">
+    <h2>Generate CPU Load</h2>
+    <button id="cpuLoadBtn">Start CPU Load (10s)</button>
+    <p>Status: <span id="loadStatus">Idle</span></p>
+  </div>
+
+  <script>
+    // Simple counter
+    let count = parseInt(localStorage.getItem('pageCount') || '0');
+    document.getElementById('counter').textContent = count;
+
+    document.getElementById('incrementBtn').addEventListener('click', function () {
+      count++;
+      document.getElementById('counter').textContent = count;
+      localStorage.setItem('pageCount', count.toString());
+
+      // Log to console (will show in NGINX logs)
+      console.log(`Counter incremented to ${count}`);
+    });
+
+    // CPU load generator
+    document.getElementById('cpuLoadBtn').addEventListener('click', function () {
+      const statusElement = document.getElementById('loadStatus');
+      statusElement.textContent = 'Running...';
+
+      // Generate load for 10 seconds
+      const endTime = Date.now() + 10000;
+
+      function generateLoad() {
+        if (Date.now() < endTime) {
+          // Perform a computationally intensive task
+          for (let i = 0; i < 1000000; i++) {
+            Math.sqrt(Math.random() * 10000);
+          }
+
+          // Schedule the next iteration
+          setTimeout(generateLoad, 0);
+        } else {
+          statusElement.textContent = 'Completed';
+          setTimeout(() => {
+            statusElement.textContent = 'Idle';
+          }, 3000);
+        }
+      }
+
+      // Start generating load
+      generateLoad();
+
+      // Log to console (will show in NGINX logs)
+      console.log('CPU load test started');
+    });
+
+    // Increment page view counter
+    window.addEventListener('load', function () {
+      const pageViews = parseInt(localStorage.getItem('pageViews') || '0');
+      localStorage.setItem('pageViews', (pageViews + 1).toString());
+    });
+  </script>
+</body>
+
+</html>
